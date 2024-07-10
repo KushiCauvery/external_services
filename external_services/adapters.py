@@ -1,9 +1,9 @@
 import requests
-from .tebt_services import TokenUrl, AppLogin, TebtPanValidate, TebtQuote
+from .tebt_services import TokenUrl, AppLogin, TebtPanValidate, TebtQuote, TebtPayment
 from .web_services import CscWebUrl, GetTokenUrl, GoogleRecaptcha, CloudFlare, GoogleAuth, FacebookAuth, SsoToken, AppleAuth
 from .crm_services import MsTokenGen, CrmLeadUrl, MobileCrmLeadUrl
 from .policy_services import ReceiptAccessToken, ReceiptDetails, ReceiptDetailsPdf, AnnualPremiumStatement, UnitStatement
-from .credit_score import CrifScore, ExperianScore
+from .credit_score import CrifScore, ExperianScore,BankCloudUrl
 from .dedupe import DedupeService
 
 class APIManager:
@@ -36,6 +36,8 @@ class APIManager:
             'FACEBOOK_AUTH_ENDPOINT': FacebookAuth,
             'APPLE_KEY_ENDPOINT': AppleAuth,
             'TEBT_GET_QUOTE_URL': TebtQuote,
+            'TEBT_PAYMENT_RECEPT_POSTING_URL': TebtPayment,
+            'BANKCLOUD_FETCH_URL': BankCloudUrl,
             'DedupeService': DedupeService
         }
         if service_type in adapters:

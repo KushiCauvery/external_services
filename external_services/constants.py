@@ -107,8 +107,22 @@ FACEBOOK_AUTH_ENDPOINT = "https://graph.facebook.com/me"
 APPLE_KEY_ENDPOINT = "https://appleid.apple.com/auth/keys"
 APPLE_AUDIENCE = "com.hdfc.comwithAppleSignIn"
 
+TEBT_PAYMENT_RECEPT_POSTING_URL = "https://soauat2.hdfclife.com/TEBT_TPSL_ExternalInteraction_ModuleWeb/sca/BillJunctionWebServiceSoapWSDLExport"
+
+
 WSDL_SUCCESS_STATUS_CODE = 200
 REQUEST_TIMEOUT = 60
 WSDL_CACHE_POLICY_VALUE = 1
 CACHE_DURATION = 3600
+
+
+#=================================Bankcloud Payment Integration===================================
+BANKCLOUD_GENERATE_ORDER_URL = "https://cvh05ghrzc.execute-api.ap-south-1.amazonaws.com/uat/pg/createorders"
+BANKCLOUD_USER_TOKEN = "77443eb9-eec7-4ca6-a4ac-3c3ff4fded9d"
+BANKCLOUD_USER_SECRET = "04fd0e09-f8a0-4bf2-bf13-33dd63b2a16d"
+ULIP_ROUTE_ID = 265
+CONVENTIONAL_ROUTE_ID = 264
+BANKCLOUD_FETCH_URL = "https://cvh05ghrzc.execute-api.ap-south-1.amazonaws.com/uat/fetch"
+
+
 

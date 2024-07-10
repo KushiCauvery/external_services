@@ -158,3 +158,10 @@ def get_wsdl_endpoint_url(wsdl_url, request):
                                    response.status_code),
                                response_msg='The website encountered an unexpected error. Please try again later.',
                                request=request, url=wsdl_url)
+    
+class TebtPayment:
+    def fetch_data(self, payload):
+        url = config.TEBT_PAYMENT_RECEPT_POSTING_URL
+        response = requests.post(url=url, data=payload, timeout=config.CUSTOMER_PORTAL_API_TIME_OUT)
+        print(response.text)
+        return response

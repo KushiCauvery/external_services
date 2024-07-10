@@ -1,9 +1,16 @@
+import base64
+import hashlib
+import hmac
+import math
+import uuid
 import requests
 from . import constants as config
 from shared_config.exceptions import GenericException
 from shared_config.exception_constants import NONRETRYABLE_CODE, STATUS_TYPE
 from shared_config.logging import custom_log
 from .models import ApiExternalLog
+import json
+from datetime import datetime
 
 class CrifScore:
     def prepare_request_data(self, name, mobile):
@@ -94,3 +101,32 @@ class ExperianScore:
         else:
             response.raise_for_status()
 
+class BankCloudUrl:
+    def fetch_data(self, payload):
+        url = config.BANKCLOUD_FETCH_URL
+        payload_str = json.dumps(payload, separators=(',', ':'))
+        headers = {
+                    'Authorization': self.generate_hash(payload_str, url),
+                    'Content-Type': 'application/json'
+                }
+        response = requests.post(url, data=payload_str.encode('utf-8'), headers=headers, timeout=config.REQUEST_TIMEOUT)
+        print(response.text)
+        return response
+ 
+    def generate_hash(self,payload_str, request_url):
+            USER_SECRET = config.BANKCLOUD_USER_SECRET
+            USER_TOKEN = config.BANKCLOUD_USER_TOKEN
+            byte_array = payload_str.encode('UTF-8')
+            data_bytes = hashlib.sha256(byte_array)
+            base64string = base64.b64encode(data_bytes.digest()).decode()
+            nonce = uuid.uuid4().hex
+            current_ts = math.floor(datetime.now().timestamp())
+            request_data = str(current_ts) + nonce + base64string + request_url
+            signature = request_data.encode('utf-8')
+            secret_key_bytes = USER_SECRET.encode('ascii')
+            signature_bytes = hmac.new(secret_key_bytes, signature, digestmod=hashlib.sha256).digest()
+            base64_request_data = base64.b64encode(signature_bytes).decode()
+            auth_token_str = base64_request_data + ":" + nonce + ":" + str(current_ts) + ":" + USER_TOKEN
+            plain_text_bytes = auth_token_str.encode('utf-8')
+            auth_token = base64.b64encode(plain_text_bytes).decode()
+            return auth_token
