@@ -106,14 +106,14 @@ class BankCloudUrl:
         url = config.BANKCLOUD_FETCH_URL
         payload_str = json.dumps(payload, separators=(',', ':'))
         headers = {
-                    'Authorization': self.generate_hash(payload_str, url),
+                    'Authorization': generate_hash(payload_str, url),
                     'Content-Type': 'application/json'
                 }
         response = requests.post(url, data=payload_str.encode('utf-8'), headers=headers, timeout=config.REQUEST_TIMEOUT)
         print(response.text)
         return response
  
-    def generate_hash(self,payload_str, request_url):
+def generate_hash(self,payload_str, request_url):
             USER_SECRET = config.BANKCLOUD_USER_SECRET
             USER_TOKEN = config.BANKCLOUD_USER_TOKEN
             byte_array = payload_str.encode('UTF-8')
@@ -130,3 +130,52 @@ class BankCloudUrl:
             plain_text_bytes = auth_token_str.encode('utf-8')
             auth_token = base64.b64encode(plain_text_bytes).decode()
             return auth_token
+
+class BankCloudToken:
+    def __init__(self, request=None, policy_no=None, payment_data=None, txn_id=None):
+        self.request = request
+        self.policy_no = policy_no
+        self.payload = None
+        self.payment_data = payment_data
+        self.txn_id = txn_id
+
+    def fetch_data(self):
+        REQUEST_TIMEOUT = 10
+        payload_str = self.request_paylaod()
+        REQUEST_URL = config.BANKCLOUD_GENERATE_ORDER_URL
+        hash = generate_hash(payload_str, REQUEST_URL)
+        headers = {
+                'Authorization': hash,
+                'Content-Type': 'application/json'
+            }
+        payload = self.request_paylaod()
+        response = requests.post(REQUEST_URL, data=payload.encode('utf-8'), headers=headers, timeout=REQUEST_TIMEOUT)
+        return response        
+
+    def request_paylaod(self):
+        route_id_ulip = config.ULIP_ROUTE_ID
+        route_id_conventional = config.CONVENTIONAL_ROUTE_ID
+        PRODUCT_TYPE_DICT = {"Conventional": "CL", "Unit linked": "UL"}
+        product_type = PRODUCT_TYPE_DICT[self.payment_data["message"]["product_type"]]
+        if not self.payload:
+            payload = {
+                "route": route_id_ulip if product_type == "UL" else route_id_conventional,
+                "producttype": product_type,
+                "paymentjourney": 1,
+                "lob": "Quick Pay",
+                "collectiontype": "Sample",
+                "consumerData": {
+                    "urn": self.txn_id,
+                    "requestreftype": "PolicyNo",
+                    "requestrefno": self.policy_no,
+                    "custname": self.payment_data["message"]["Full_name"],
+                    "custmobile": self.payment_data["message"]["mobile"],
+                    "custemail": self.payment_data["message"]["email"],
+                    "dueamount": self.payment_data["message"]["Insurance_premium"],
+                },
+                "redirect_url_fail": "https://Checkout/QuickPayFailure",
+                "redirect_url_success": "https://Checkout/QuickPaySuccess"
+            }
+            self.payload = json.dumps(payload, separators=(',', ':'))
+        return self.payload
+
