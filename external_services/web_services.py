@@ -89,33 +89,24 @@ class CloudFlare:
     def fetch_data(self, payload):
         response = requests.post(config.CF_BASE_URL, json=payload, headers={"X-Auth-Email": config.AUTH_EMAIL,
                                                                             "X-Auth-Key": config.GLOBAL_API_KEY})
-        return response.json()
+        return response
     
 class GoogleAuth:
     def fetch_data(self, payload):
         access_token = payload["access_token"]
         google_url = config.GOOGLE_AUTH_ENDPOINT + "?access_token=" + access_token
-        custom_log(level='info', request=payload, params={'body': {'google_url': google_url}, 'detail': 'calling google for data.'})
+        #custom_log(level='info', request=payload, params={'body': {'google_url': google_url}, 'detail': 'calling google for data.'})
         response = requests.get(google_url, timeout=constants.DEFAULT_TIMEOUT)
-        print(response.status_code)
-
-        # if response.status_code != status.HTTP_200_OK:
-        #     raise GenericException(status_type=STATUS_TYPE["APP"], exception_code=NONRETRYABLE_CODE["BAD_REQUEST"],
-        #                            detail="Error fetching response from Google", request=payload,
-        #                            response_msg='Error fetching response from Google')
-        # custom_log(level='info', request=payload, params={'body': json.loads(response.text), 'detail': 'Data returned from google.'})
-        return json.loads(response.text)
+        return response
     
 class FacebookAuth:
     def fetch_data(self, payload):
         access_token = payload["access_token"]
         try:
             fb_url = config.FACEBOOK_AUTH_ENDPOINT + "?fields=id,name,email,picture{url}&access_token=" + access_token
-            print(fb_url)
-            custom_log(level='info', request=payload, params={'body': {'google_url': fb_url}, 'detail': 'calling facebook for data.'})
             response = requests.get(fb_url, timeout=constants.DEFAULT_TIMEOUT, verify=False)
-            custom_log(level='info', request=payload, params={'body': json.loads(response.text), 'detail': 'Data returned from facebook.'})
-            return json.loads(response.text)
+            #custom_log(level='info', request=payload, params={'body': json.loads(response.text), 'detail': 'Data returned from facebook.'})
+            return response
         except:
             raise GenericException(status_type=STATUS_TYPE["APP"], exception_code=NONRETRYABLE_CODE["BAD_REQUEST"], detail="Error while validating facebook user info", response_msg='Error while validating facebook user info', request=payload)
         

@@ -16,26 +16,23 @@ class TokenUrl:
         url =  config.GENERATE_TOKEN_URL
         headers = {'Content-type': 'application/json', 'Authorization': config.AUTH_TOKEN_FOR_GENERATE_TOKEN}
         response = requests.get(url, headers=headers)
-        if response.status_code == 200:
-            return json.loads(response.text)
-        else:
-            response.raise_for_status()
+        return response
+        # if response.status_code == 200:
+        #     return json.loads(response.text)
+        # else:
+        #     response.raise_for_status()
 
 class AppLogin:
-    def fetch_data(self, payload):
+    def fetch_data(self, payload, headers):
         url =  config.CP_APP_LOGIN_URL
         params_str = json.dumps(payload)
-        token_url_instance = TokenUrl()  
-        token_data = token_url_instance.fetch_data()  
-        token = token_data.get("body").get("token")
-        headers = {'Content-type': 'application/json', 'Authorization': 'Basic ' + token}
+        # token_url_instance = TokenUrl()  
+        # token_data = token_url_instance.fetch_data() 
+        # token = token_data.get("body").get("token")
+        # headers = {'Content-type': 'application/json', 'Authorization': 'Basic ' + headers}
         response = requests.post(url=url, data=params_str.encode('utf-8'), headers=headers,
                                  timeout=constants.DEFAULT_TIMEOUT)
-        if response.status_code == 200:
-            #return json.loads(response.text)
-            return response.text
-        else:
-            response.raise_for_status()
+        return response
 
 class TebtPanValidate:
     def fetch_data(self, payload):
@@ -59,17 +56,8 @@ class TebtPanValidate:
                 ]
             }
         }
-        try:
-            response = requests.get(url, data=json.dumps(request_data))
-            if response.status_code == 200:
-                response_json = response.json()
-                if response_json['head']['status'] == 'Success' and \
-                        response_json['panres']['pandtls'][0]['panstatus'] == 'E':
-                    return True
-            custom_log(level='info', request=None, params={'message': 'Failed to validate PAN number.', 'response': response.text})
-        except Exception as e:
-            custom_log(level='error', request=None, params={'message': 'Failed to validate PAN number.'})
-        return False
+        response = requests.get(url, data=json.dumps(request_data))
+        return response
 
 class ValidSoapResponse(MessagePlugin):
     def __init__(self, *args, **kwargs):
@@ -120,17 +108,16 @@ class TebtQuote:
         plugin = ValidSoapResponse(request=request)
         proxy = api_utils.get_proxy(request=request)
         url = config.TEBT_GET_QUOTE_URL
-
         try:
             client = suds_client(get_wsdl_endpoint_url(url, request), plugins=[plugin], cache=cache, cachingpolicy=config.WSDL_CACHE_POLICY_VALUE, proxy=proxy)
-            client.set_options(timeout=config.REQUEST_TIMEOUT)
-            return client
         except Exception as e:
             raise GenericException(status_type=STATUS_TYPE['TEBT'], 
                                 exception_code=RETRYABLE_CODE['API_UNREACHABLE'],
                                 detail='TEBT services down. ' + repr(e),
                                 response_msg='The website encountered an unexpected error. Please try again later.',
                                 body=None, url=url)
+        client.set_options(timeout=config.REQUEST_TIMEOUT)
+        return client
         
 def get_wsdl_endpoint_url(wsdl_url, request):
     """
@@ -163,5 +150,4 @@ class TebtPayment:
     def fetch_data(self, payload):
         url = config.TEBT_PAYMENT_RECEPT_POSTING_URL
         response = requests.post(url=url, data=payload, timeout=config.CUSTOMER_PORTAL_API_TIME_OUT)
-        print(response.text)
         return response

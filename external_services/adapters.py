@@ -3,7 +3,7 @@ from .tebt_services import TokenUrl, AppLogin, TebtPanValidate, TebtQuote, TebtP
 from .web_services import CscWebUrl, GetTokenUrl, GoogleRecaptcha, CloudFlare, GoogleAuth, FacebookAuth, SsoToken, AppleAuth
 from .crm_services import MsTokenGen, CrmLeadUrl, MobileCrmLeadUrl
 from .policy_services import ReceiptAccessToken, ReceiptDetails, ReceiptDetailsPdf, AnnualPremiumStatement, UnitStatement
-from .credit_score import CrifScore, ExperianScore,BankCloudUrl, BankCloudToken
+from .credit_score import CrifScore, ExperianScore,BankCloudUrl
 from .dedupe import DedupeService
 
 class APIManager:
@@ -38,7 +38,6 @@ class APIManager:
             'TEBT_GET_QUOTE_URL': TebtQuote,
             'TEBT_PAYMENT_RECEPT_POSTING_URL': TebtPayment,
             'BANKCLOUD_FETCH_URL': BankCloudUrl,
-            'BANKCLOUD_GENERATE_ORDER_URL': BankCloudToken,
             'DedupeService': DedupeService
         }
         if service_type in adapters:
