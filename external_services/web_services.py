@@ -21,10 +21,10 @@ class CscWebUrl:
         
         response = requests.post(url=url, data=payload, timeout=config.CUSTOMER_PORTAL_API_TIME_OUT,
                              headers={"Content-Type": "text/plain"})
-        if response.status_code == 200:
-            return response.text
-        else:
-            response.raise_for_status()
+        # if response.status_code == 200:
+        #     return response.text
+        # else:
+        #     response.raise_for_status()
 
 class GetTokenUrl:
     def fetch_data(self, payload):
@@ -148,5 +148,5 @@ def apple_data_sanitization(data_dict, request):
 
 class SsoToken:
     def fetch_data(self, payload):
-        access_token = payload["access_token"]
+        access_token = payload#["access_token"]
         return config.SSO_VALIDATE_TOKEN_URL + access_token
