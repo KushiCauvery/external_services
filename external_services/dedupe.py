@@ -96,6 +96,9 @@ class DedupeService:
             raise APIException("Error Fetching data")
         return resp.json()["data"]
 
+    def fetch_data(self, user):
+        return self.fetch_customer_data_from_dedupe(user)
+
     def get_customer_client_ids(self, user):
         client_id_list = list()
         user_identifier = [user.phone, user.country_code + user.phone]
