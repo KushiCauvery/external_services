@@ -62,14 +62,14 @@ RECEIPT_PDF_API_NAME = "getReceiptPdfMail"
 #=================================CRIF Integration===================================
 CRIF_URL = "https://test.crifhighmark.com/InquiryAgentOriginal/doGetFusionSync.service/fusionSync"
 CRIF_USER = "balaji.m21@hdfclife.com"
-CRIF_PASSWORD = "+GW1NiOxIf007lQmx5Llwzr4wic="
+CRIF_PASSWORD = os.getenv("CRIF_PASSWORD")
 SUB_MBR_ID = "HDFC Life"
 CUSTOMER_ID = "INS0000001"
 
 #=================================Experian Integration===================================
 EXPERIAN_URL = "https://connectuat.experian.in:8443/ngwsconnect/ngws"
 EXPERIAN_USER = "cpu2hdfclife_uat05"
-EXPERIAN_PASSWORD = "Kuliz@301"
+EXPERIAN_PASSWORD = os.getenv("EXPERIAN_PASSWORD")
 EXPERIAN_PROCEED_AT_EXACT_MATCH = True
 EXPERIAN_REPORT_VALIDITY = 60
 
@@ -78,7 +78,7 @@ DEDUPE_GENERATE_TOKEN_URL = "https://customer-uat-public.api-hdfclife.com/v1/ext
 DEDUPE_REFRESH_TOKEN_URL = "https://customer-uat-public.api-hdfclife.com/v1/external/refresh"
 DEDUPE_API_URL = "https://customer-uat-public.api-hdfclife.com/v1/customers/dedupes"
 DEDUPE_USERID="hdfc_capp"
-DEDUPE_PASSWORD="HdfcApp@2023"
+DEDUPE_PASSWORD=os.getenv("DEDUPE_PASSWORD")
 
 # Google Recaptcha Settings
 GOOGLE_RECAPTCHA_SECRET_KEY = os.getenv("GOOGLE_RECAPTCHA_SECRET_KEY")
@@ -98,7 +98,7 @@ CF_WEBSITE_DOMAIN = 'www.hdfclife.com'
 CF_API_DOMIAN = "api.hdfclife.com"
 CF_MOBILE_DOMIAN = "mobapp.hdfclife.com"
 
-TEBT_BASE_URL = 'http://124.30.32.37:9082/'
+TEBT_BASE_URL = os.getenv("TEBT_BASE_URL")
 TEBT_PAN_VALIDATION = TEBT_BASE_URL + 'TEBT_CommonValidationsWeb/TEBT_CommonValidationsExport/validatepan'
 TEBT_GET_QUOTE_URL = TEBT_BASE_URL + 'TEBT_QuoteGenerationWeb/sca/QuoteGeneration_ThirdPartyExport?wsdl'
 
@@ -123,6 +123,9 @@ BANKCLOUD_USER_SECRET = "04fd0e09-f8a0-4bf2-bf13-33dd63b2a16d"
 ULIP_ROUTE_ID = 265
 CONVENTIONAL_ROUTE_ID = 264
 BANKCLOUD_FETCH_URL = "https://cvh05ghrzc.execute-api.ap-south-1.amazonaws.com/uat/fetch"
-
+ERROR_FETCH = "Error Fetching data"
+WEBSITE_ERROR="The website encountered an unexpected error. Please try again later."
+BEARER_VALUE="Bearer %s"
+SOAP_URL_START="<soapenv:Envelope"
 
 

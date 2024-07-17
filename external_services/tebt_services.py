@@ -17,19 +17,11 @@ class TokenUrl:
         headers = {'Content-type': 'application/json', 'Authorization': config.AUTH_TOKEN_FOR_GENERATE_TOKEN}
         response = requests.get(url, headers=headers)
         return response
-        # if response.status_code == 200:
-        #     return json.loads(response.text)
-        # else:
-        #     response.raise_for_status()
 
 class AppLogin:
     def fetch_data(self, payload, headers):
         url =  config.CP_APP_LOGIN_URL
         params_str = json.dumps(payload)
-        # token_url_instance = TokenUrl()  
-        # token_data = token_url_instance.fetch_data() 
-        # token = token_data.get("body").get("token")
-        # headers = {'Content-type': 'application/json', 'Authorization': 'Basic ' + headers}
         response = requests.post(url=url, data=params_str.encode('utf-8'), headers=headers,
                                  timeout=constants.DEFAULT_TIMEOUT)
         return response
@@ -81,22 +73,22 @@ class ValidSoapResponse(MessagePlugin):
         params['detail'] = "Response obtained from TEBT server"
         custom_log('info', request=self.kwargs['request'], params=params)
         sys.stdout.flush()
-        answerDecoded = answer.decode()
-        if '<soapenv:Envelope' in answerDecoded:
-            header_split = answerDecoded.split('<soapenv:Envelope')
-            header_split_msg = '<soapenv:Envelope' + header_split[1]
+        answer_decoded = answer.decode()
+        if config.SOAP_URL_START in answer_decoded:
+            header_split = answer_decoded.split(config.SOAP_URL_START)
+            header_split_msg = config.SOAP_URL_START + header_split[1]
 
             footer_split = header_split_msg.split('</soapenv:Envelope>')
-            replyFinal = footer_split[0] + '</soapenv:Envelope>'
+            reply_final = footer_split[0] + '</soapenv:Envelope>'
         else:
-            header_split = answerDecoded.split('<soap:Envelope')
+            header_split = answer_decoded.split('<soap:Envelope')
             header_split_msg = '<soap:Envelope' + header_split[1]
 
             footer_split = header_split_msg.split('</soap:Envelope>')
-            replyFinal = footer_split[0] + '</soap:Envelope>'
+            reply_final = footer_split[0] + '</soap:Envelope>'
 
-        replyFinalDecoded = replyFinal.encode()
-        context.reply = replyFinalDecoded
+        reply_final_decoded = reply_final.encode()
+        context.reply = reply_final_decoded
 
 
 cache = ObjectCache()
@@ -114,7 +106,7 @@ class TebtQuote:
             raise GenericException(status_type=STATUS_TYPE['TEBT'], 
                                 exception_code=RETRYABLE_CODE['API_UNREACHABLE'],
                                 detail='TEBT services down. ' + repr(e),
-                                response_msg='The website encountered an unexpected error. Please try again later.',
+                                response_msg=config.WEBSITE_ERROR,
                                 body=None, url=url)
         client.set_options(timeout=config.REQUEST_TIMEOUT)
         return client
@@ -133,7 +125,7 @@ def get_wsdl_endpoint_url(wsdl_url, request):
         custom_log(level='info', request=request, params={'detail': 'Error from tebt.', 'body': {'error_msg': repr(e)}})
         raise GenericException(status_type=STATUS_TYPE['TEBT'], exception_code=RETRYABLE_CODE['API_UNREACHABLE'],
                                detail='TEBT services down.' + repr(e),
-                               response_msg='The website encountered an unexpected error. Please try again later.',
+                               response_msg=config.WEBSITE_ERROR,
                                request=request, url=wsdl_url)
     custom_log('info', request, {'detail': 'Response received from wsdl service.', 'body': {'params': {}}})
     if response.status_code == config.WSDL_SUCCESS_STATUS_CODE:
@@ -143,7 +135,7 @@ def get_wsdl_endpoint_url(wsdl_url, request):
         raise GenericException(status_type=STATUS_TYPE['TEBT'], exception_code=RETRYABLE_CODE['API_UNREACHABLE'],
                                detail='TEBT services down due to get_wsdl_endpoint_url function and its status code: ' + str(
                                    response.status_code),
-                               response_msg='The website encountered an unexpected error. Please try again later.',
+                               response_msg=config.WEBSITE_ERROR,
                                request=request, url=wsdl_url)
     
 class TebtPayment:

@@ -31,9 +31,9 @@ class DedupeService:
             resp = requests.post(self.GENERATE_TOKEN_URL, data=payload, proxies=self.proxy, timeout=self.REQUEST_TIMEOUT)
             resp.raise_for_status()
         except Exception:
-            raise
+            raise APIException("Error Fetching data from external api")
         if resp.status_code != status.HTTP_200_OK:
-            raise APIException("Error Fetching data")
+            raise APIException(settings.ERROR_FETCH)
         token = resp.json()["data"]["token"]
         self._store_token(token)
         return token
@@ -43,7 +43,7 @@ class DedupeService:
             self._generate_token()
         token = self.cache.get(self.TOKEN_CACHE_KEY)
         headers = {
-            "Authorization": "Bearer %s" % token
+            "Authorization": settings.BEARER_VALUE % token
         }
         payload = {
             "projectCode": "customer_app"
@@ -52,9 +52,9 @@ class DedupeService:
             resp = requests.post(self.REFRESH_TOKEN_URL, headers=headers, data=payload, proxies=self.proxy, timeout=self.REQUEST_TIMEOUT)
             resp.raise_for_status()
         except Exception:
-            raise
+            raise APIException(settings.ERROR_FETCH)
         if resp.status_code != status.HTTP_200_OK:
-            raise APIException("Error Fetching data")
+            raise APIException(settings.ERROR_FETCH)
         token = resp.json()["data"]["token"]
         self._store_token(token)
         return token
@@ -63,7 +63,6 @@ class DedupeService:
         """
         saves token in redis cache till expiry.
         """
-        # exp_in_second = jwt.decode(token, verify=False)['exp'] - int(datetime.now().timestamp())
         self.cache.set(self.TOKEN_CACHE_KEY, token, timeout=self.TOKEN_CACHE_TIMEOUT)
 
     def _get_token(self):
@@ -79,7 +78,7 @@ class DedupeService:
     def fetch_customer_data_from_dedupe(self, user):
         token = self._get_token()
         headers = {
-            "Authorization": "Bearer %s" % token
+            "Authorization": settings.BEARER_VALUE % token
         }
         payload = {
             "projectCode": "customer_app",
@@ -93,7 +92,7 @@ class DedupeService:
         except Exception:
             raise APIException("Something went wrong")
         if resp.status_code != status.HTTP_200_OK:
-            raise APIException("Error Fetching data")
+            raise APIException(settings.ERROR_FETCH)
         return resp.json()["data"]
 
     def fetch_data(self, user):
@@ -138,7 +137,6 @@ class DedupeService:
                 policy_master_data["first_name"] = data.get("customer_first_name")
                 policy_master_data["last_name"] = data.get("customer_last_name")
                 policy_master_data["dob"] = dob
-                policy_master_data["source"] = "exide_life"
 
                 for policy in data.get("policy_details", []):
                     policy_data = policy_master_data.copy()
@@ -154,7 +152,7 @@ class DedupeService:
     def get_customer_details_by_policy_id(self, policy_id):
         token = self._get_token()
         headers = {
-            "Authorization": "Bearer %s" % token
+            "Authorization": settings.BEARER_VALUE % token
         }
         payload = {
             "projectCode": "qr_service",
@@ -168,7 +166,7 @@ class DedupeService:
         except Exception:
             raise APIException("Something went wrong")
         if resp.status_code != status.HTTP_200_OK:
-            raise APIException("Error Fetching data")
+            raise APIException(settings.ERROR_FETCH)
         response_data = resp.json()["data"]
         result = dict()
         for data in response_data:

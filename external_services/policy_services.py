@@ -38,11 +38,6 @@ class ReceiptDetails:
             }
         }
         payload = json.dumps(request_data, separators=(',', ':'))
-        # receipt_access_token = ReceiptAccessToken()
-        # access_token_data = receipt_access_token.fetch_data()
-        # access_token = access_token_data['body']['authtoken']
-        # headers = {'accesstoken': access_token,
-        #            'x-api-key': config.RECEIPT_X_API_KEY}
         response = requests.post(url, payload.encode('utf-8'), headers=headers, timeout=constants.DEFAULT_TIMEOUT)
         return response
 

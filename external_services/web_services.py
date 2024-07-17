@@ -21,10 +21,7 @@ class CscWebUrl:
         
         response = requests.post(url=url, data=payload, timeout=config.CUSTOMER_PORTAL_API_TIME_OUT,
                              headers={"Content-Type": "text/plain"})
-        # if response.status_code == 200:
-        #     return response.text
-        # else:
-        #     response.raise_for_status()
+        return response
 
 class GetTokenUrl:
     def fetch_data(self, payload):
@@ -42,10 +39,6 @@ class GetTokenUrl:
             }
         }
         params_str = json.dumps(params)
-        # print(params_str)
-        # resp = requests.post(url, data=params_str.encode('utf-8'), headers=headers, timeout=constants.DEFAULT_TIMEOUT)
-        # print(resp) #504
-        # return resp
         try:
             resp = requests.post(url, data=params_str.encode('utf-8'), headers=headers, timeout=constants.DEFAULT_TIMEOUT)
         except Exception as e:
@@ -95,7 +88,6 @@ class GoogleAuth:
     def fetch_data(self, payload):
         access_token = payload["access_token"]
         google_url = config.GOOGLE_AUTH_ENDPOINT + "?access_token=" + access_token
-        #custom_log(level='info', request=payload, params={'body': {'google_url': google_url}, 'detail': 'calling google for data.'})
         response = requests.get(google_url, timeout=constants.DEFAULT_TIMEOUT)
         return response
     
@@ -105,10 +97,9 @@ class FacebookAuth:
         try:
             fb_url = config.FACEBOOK_AUTH_ENDPOINT + "?fields=id,name,email,picture{url}&access_token=" + access_token
             response = requests.get(fb_url, timeout=constants.DEFAULT_TIMEOUT, verify=False)
-            #custom_log(level='info', request=payload, params={'body': json.loads(response.text), 'detail': 'Data returned from facebook.'})
             return response
-        except:
-            raise GenericException(status_type=STATUS_TYPE["APP"], exception_code=NONRETRYABLE_CODE["BAD_REQUEST"], detail="Error while validating facebook user info", response_msg='Error while validating facebook user info', request=payload)
+        except Exception as e:
+            raise GenericException(status_type=STATUS_TYPE["APP"], exception_code=NONRETRYABLE_CODE["BAD_REQUEST"], detail="Error while validating facebook user info " + repr(e), response_msg='Error while validating facebook user info', request=payload)
         
 class AppleAuth:
     def fetch_data(self, payload):
@@ -129,22 +120,18 @@ class AppleAuth:
                                 algorithms=header_data.get("alg"))
             apple_data_sanitization(result, request)
             return result
-        except:
+        except Exception as e:
             raise GenericException(status_type=STATUS_TYPE["APP"], exception_code=NONRETRYABLE_CODE["BAD_REQUEST"],
-                                detail="Error while validating apple user info",
+                                detail="Error while validating apple user info" +repr(e),
                                 response_msg='Error while validating apple user info', request=request)
 
 def apple_data_sanitization(data_dict, request):
     for key, value in data_dict.items():
-        if isinstance(value, int):
-            pass
-        elif isinstance(value, str):
+        if isinstance(value, str):
             if re.search(value, constants.BLACKLISTED_CHARS):
                 raise GenericException(status_type=STATUS_TYPE["APP"], exception_code=NONRETRYABLE_CODE["BAD_REQUEST"],
                                        detail="Error while validating apple user info",
                                        response_msg='Error while validating apple user info', request=request)
-        elif isinstance(value, bool):
-            pass
 
 class SsoToken:
     def fetch_data(self, payload):

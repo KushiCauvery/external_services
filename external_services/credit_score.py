@@ -21,10 +21,10 @@ class CrifScore:
         url = config.CRIF_URL
         name = payload["name"]
         mobile = payload["mobile"]
-        requestXML = self.prepare_request_data(name, mobile)
+        request_xml = self.prepare_request_data(name, mobile)
         headers = {
             'Content-Type': 'application/xml',
-            'requestXML': requestXML,
+            'requestXML': request_xml,
             'userId': config.CRIF_USER,
             'password': config.CRIF_PASSWORD,
             'mbrid': 'INS0000001',
@@ -38,7 +38,7 @@ class CrifScore:
                 request_log=payload["log_obj"], #need to check this while integrating the api
                 service_name='CRIF',
                 service_url=url,
-                request_body=requestXML,
+                request_body=request_xml,
             )
             response = requests.request("POST", url, headers=headers, data=payload)
             external_log.response = response.text
@@ -109,7 +109,7 @@ class BankCloudUrl:
         url = config.BANKCLOUD_FETCH_URL
         payload_str = json.dumps(payload, separators=(',', ':'))
         headers = {
-                    'Authorization': generate_hash(payload_str, url),
+                    'Authorization': generate_hash(self,payload_str, url),
                     'Content-Type': 'application/json'
                 }
         response = requests.post(url, data=payload_str.encode('utf-8'), headers=headers, timeout=config.REQUEST_TIMEOUT)
@@ -146,9 +146,9 @@ class BankCloudToken:
         REQUEST_TIMEOUT = 10
         payload_str = self.request_paylaod()
         REQUEST_URL = config.BANKCLOUD_GENERATE_ORDER_URL
-        hash = generate_hash(payload_str, REQUEST_URL)
+        hash_request = generate_hash(self,payload_str, REQUEST_URL)
         headers = {
-                'Authorization': hash,
+                'Authorization': hash_request,
                 'Content-Type': 'application/json'
             }
         payload = self.request_paylaod()
