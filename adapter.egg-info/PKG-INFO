@@ -1,0 +1,12 @@
+Metadata-Version: 2.1
+Name: adapter
+Version: 0.1
+Requires-Dist: django
+Requires-Dist: djangorestframework
+Requires-Dist: pycryptodome
+Requires-Dist: django-environ
+Requires-Dist: pystache
+Requires-Dist: psycopg2
+Requires-Dist: xmltodict
+Requires-Dist: suds
+Requires-Dist: PyJWT

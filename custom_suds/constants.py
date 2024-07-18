@@ -1,0 +1,1 @@
+KEYS_WITHOUT_DEFINITION = ['tpastatusrk', 'homevisitflag']

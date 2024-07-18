@@ -1,12 +1,15 @@
-from setuptools import setup
+"""
+Setup script for the external_services package.
+"""
+
+from setuptools import setup, find_packages
 
 setup(
-    name='external_services',
+    name='adapter',
     version='0.1',
-    packages=['external_services'],
-    include_package_data=True,  # Ensure package data is included
+    packages=find_packages(),
+    include_package_data=True,  
     install_requires=[
-        'shared_config',
         'django',
         'djangorestframework',
         'pycryptodome',
