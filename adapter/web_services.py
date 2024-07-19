@@ -113,7 +113,7 @@ class GoogleRecaptcha:
             secret_key = config.GOOGLE_RECAPTCHA_V3_SECRET_KEY
         values = '?secret=' + str(secret_key) + '&response=' + str(recaptcha_response)
         try:
-            response = requests.post(config.GOOGLE_RECAPTCHA_VERIFY_URL + values, {},
+            response = requests.post(config.GOOGLE_RECAPTCHA_VERIFY_URL + values, {}, verify=False,
                                      timeout=config.GOOGLE_RECAPTCHA_TIMEOUT).json()
         except Exception as e:
             custom_log(level="info", request=None, params=
@@ -167,7 +167,7 @@ class FacebookAuth:
                 "?fields=id,name,email,picture{url}&access_token=" +
                 access_token
             )
-            response = requests.get(fb_url, timeout=constants.DEFAULT_TIMEOUT)
+            response = requests.get(fb_url, timeout=constants.DEFAULT_TIMEOUT, verify=False)
             return response
         except Exception as e:
             raise GenericException(status_type=STATUS_TYPE["APP"],
