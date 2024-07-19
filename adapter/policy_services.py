@@ -1,5 +1,5 @@
 """
-Module for fetching various policy-related data through API calls.
+Module for fetching various policy related data through API calls.
 """
 
 import json
