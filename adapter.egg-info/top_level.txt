@@ -1,2 +1,0 @@
-adapter
-custom_suds

@@ -1,9 +1,0 @@
-django
-djangorestframework
-pycryptodome
-django-environ
-pystache
-psycopg2
-xmltodict
-suds
-PyJWT
